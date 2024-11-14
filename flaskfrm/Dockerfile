@@ -2,7 +2,8 @@ FROM python:3.9-slim
 
 RUN mkdir /crud
 
-COPY ./app/* /crud/
+COPY ./app/ /crud/
 RUN pip install -r /crud/requirements.txt
 
-CMD ["python", "/crud/frm.py"]
+ENV FLASK_APP=/crud/frm.py
+CMD ["flask", "run", "--host=0.0.0.0"]
