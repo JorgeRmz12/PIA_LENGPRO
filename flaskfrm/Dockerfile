@@ -1,7 +1,8 @@
 FROM python:3.9-slim
 
-RUN pip install -r requirements.txt
+RUN mkdir /crud
 
-EXPOSE 5000
+COPY ./app/* /crud/
+RUN pip install -r /crud/requirements.txt
 
-CMD ["python", "frm.py"]
+CMD ["python", "/crud/frm.py"]

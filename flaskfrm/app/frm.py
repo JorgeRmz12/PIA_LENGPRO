@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for
-from app import app
-from dbconfig import getDBConnection
 import pymysql
+from dbconfig import getDBConnection
+from flask import Flask, redirect, render_template, request, url_for
 
-@app.route('/', methods=["GET"])
+from app import app
+
+
+@app.route("/", methods=["GET"])
 def index():
     connection = getDBConnection()
     cursor = connection.cursor(pymysql.cursors.DictCursor)
@@ -18,18 +20,21 @@ def index():
         cursor.close()
         connection.close()
 
-    return render_template('frm.html', personas=personas)
+    return render_template("frm.html", personas=personas)
 
-@app.route('/', methods=['POST'])
+
+@app.route("/", methods=["POST"])
 def submit():
-    nombre = request.form['nombre']
-    apellido = request.form['apellido']
-    
+    nombre = request.form["nombre"]
+    apellido = request.form["apellido"]
+
     connection = getDBConnection()
     cursor = connection.cursor()
 
     try:
-        cursor.execute("INSERT INTO personas (nombre, apellido) VALUES (%s,%s)", (nombre, apellido))
+        cursor.execute(
+            "INSERT INTO personas (nombre, apellido) VALUES (%s,%s)", (nombre, apellido)
+        )
         connection.commit()
     except pymysql.MySQLError as e:
         print(f"Error: {e}")
@@ -37,14 +42,15 @@ def submit():
         cursor.close()
         connection.close()
 
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
+
 
 # Ruta para cargar el formulario de edición
-@app.route('/edit/<int:id>', methods=['GET'])
+@app.route("/edit/<int:id>", methods=["GET"])
 def edit(id):
     connection = getDBConnection()
     cursor = connection.cursor(pymysql.cursors.DictCursor)
-    
+
     try:
         cursor.execute("SELECT * FROM personas WHERE id = %s", (id,))
         persona = cursor.fetchone()
@@ -55,19 +61,23 @@ def edit(id):
         cursor.close()
         connection.close()
 
-    return render_template('edit_frm.html', persona=persona)
+    return render_template("edit_frm.html", persona=persona)
+
 
 # Ruta para actualizar un registro en la base de datos
-@app.route('/update/<int:id>', methods=['POST'])
+@app.route("/update/<int:id>", methods=["POST"])
 def update(id):
-    nombre = request.form['nombre']
-    apellido = request.form['apellido']
+    nombre = request.form["nombre"]
+    apellido = request.form["apellido"]
 
     connection = getDBConnection()
     cursor = connection.cursor()
 
     try:
-        cursor.execute("UPDATE personas SET nombre = %s, apellido = %s WHERE id = %s", (nombre, apellido, id))
+        cursor.execute(
+            "UPDATE personas SET nombre = %s, apellido = %s WHERE id = %s",
+            (nombre, apellido, id),
+        )
         connection.commit()
     except pymysql.MySQLError as e:
         print(f"Error: {e}")
@@ -75,10 +85,11 @@ def update(id):
         cursor.close()
         connection.close()
 
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
+
 
 # Ruta para eliminar un registro en la base de datos
-@app.route('/delete/<int:id>', methods=['POST'])
+@app.route("/delete/<int:id>", methods=["POST"])
 def delete(id):
     connection = getDBConnection()
     cursor = connection.cursor()
@@ -92,7 +103,8 @@ def delete(id):
         cursor.close()
         connection.close()
 
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
+
 
 if __name__ == "__main__":
     app.run()
